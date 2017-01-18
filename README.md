@@ -1,5 +1,7 @@
 # healthchecks
 
+[![Build Status](https://travis-ci.org/andela/healthchecks_spartans.svg?branch=readme_setup)](https://travis-ci.org/andela/healthchecks_spartans.svg?branch=readme_setup)
+
 ![Screenshot of Welcome page](/stuff/screenshots/welcome.png?raw=true "Welcome Page")
 
 ![Screenshot of My Checks page](/stuff/screenshots/my_checks.png?raw=true "My Checks Page")
