@@ -15,3 +15,5 @@ script:
   - coverage run --omit=*/tests/* --source=hc manage.py test
 after_success: coveralls
 cache: pip
+notifications:
+  slack: andela:14SZ2ED9ChjdWi2X5ZI5LXeI
