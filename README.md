@@ -1,5 +1,9 @@
 # healthchecks
 
+[![Build Status](https://travis-ci.org/andela/healthchecks_spartans.svg)](https://travis-ci.org/andela/healthchecks_spartans)
+[![Coverage Status](https://coveralls.io/repos/github/andela/healthchecks_spartans/badge.svg?branch=dev)](https://coveralls.io/github/andela/healthchecks_spartans?branch=dev)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/andela/healthchecks_spartans/badges/quality-score.png?b=dev)](https://scrutinizer-ci.com/g/andela/healthchecks_spartans/?branch=dev)
+
 ![Screenshot of Welcome page](/stuff/screenshots/welcome.png?raw=true "Welcome Page")
 
 ![Screenshot of My Checks page](/stuff/screenshots/my_checks.png?raw=true "My Checks Page")
