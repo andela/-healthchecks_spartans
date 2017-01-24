@@ -95,8 +95,8 @@ if os.environ.get("DB") == "postgres":
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME':     'hc',
-            'USER':     'postgres',
+            'NAME':   'hc',
+            'USER':   'postgres',
             'TEST': {'CHARSET': 'UTF8'}
         }
     }
@@ -111,9 +111,6 @@ if os.environ.get("DB") == "mysql":
         }
     }
 
-# Update database configuration with $DATABASE_URL.
-#db_from_env = dj_database_url.config(conn_max_age=500)
-#DATABASES['default'].update(db_from_env)
 
 LANGUAGE_CODE = 'en-us'
 
