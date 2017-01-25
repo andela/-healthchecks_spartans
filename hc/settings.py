@@ -79,10 +79,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'hc.wsgi.application'
 TEST_RUNNER = 'hc.api.tests.CustomRunner'
 
+
 DATABASES = {}
 
 if os.environ.get('TRAVIS_DB', None):
-
     DATABASES['default'] = {
         'ENGINE' : 'django.db.backends.postgres_psycopg2'
         'NAME' : 'hc'
@@ -93,6 +93,7 @@ if os.environ.get('TRAVIS_DB', None):
 else:
 
     DATABASES['default'] = dj_database_url.config()
+
 
 
 LANGUAGE_CODE = 'en-us'
