@@ -1,0 +1,5 @@
+[report]
+omit =
+  */tests/*
+  hc/wsgi.py
+  */migrations/*
