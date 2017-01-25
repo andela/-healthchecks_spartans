@@ -84,7 +84,7 @@ DATABASES = {}
 
 if os.environ.get('TRAVIS_DB', None):
     DATABASES['default'] = {
-        'ENGINE' : 'django.db.backends.postgres_psycopg2',
+        'ENGINE' : 'django.db.backends.postgresql',
         'NAME' : 'hc',
         'USER' : 'travis',
         'PASSWORD' : '',
