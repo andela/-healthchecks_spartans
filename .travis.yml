@@ -6,12 +6,12 @@ install:
     - pip install -r requirements.txt
     - pip install braintree coveralls mock mysqlclient
 env:
-  - DB=sqlite
-  - DB=mysql
-  - DB=postgres
+  - TRAVIS_DB=True
 addons:
   postgresql: "9.4"
 script:
-  - coverage run --omit=*/tests/* --source=hc manage.py test
-after_success: coveralls
-cache: pip
+  - coverage run --source=hc manage.py test
+after_success:
+  coveralls
+notifications:
+  slack: andela:14SZ2ED9ChjdWi2X5ZI5LXeI
