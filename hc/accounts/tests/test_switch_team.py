@@ -31,3 +31,4 @@ class SwitchTeamTestCase(BaseTestCase):
         url = "/accounts/switch_team/%s/" % self.alice.username
         r = self.client.get(url, follow=True)
         ### Assert the expected error code
+        self.assertRedirects(r, "/checks/", 302, 200)
