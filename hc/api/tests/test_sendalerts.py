@@ -21,14 +21,25 @@ class SendAlertsTestCase(BaseTestCase):
             check.save()
 
         result = Command().handle_many()
-        assert result, "handle_many should return True"
+        self.assertTrue(result) # "handle_many should return True"
 
         handled_names = []
         for args, kwargs in mock.call_args_list:
             handled_names.append(args[0].name)
 
-        assert set(names) == set(handled_names)
+        self.assertEqual(set(names), set(handled_names))
         ### The above assert fails. Make it pass
+
+        more_names = ["Check %d" % d for d in range(0, 100)]
+
+        for name in more_names:
+            check = Check(user=self.alice, name=name)
+            check.alert_after = yesterday
+            check.status = "up"
+            check.save()
+
+        result = Command().handle_many()
+        self.assertTrue(result)
 
     def test_it_handles_grace_period(self):
         check = Check(user=self.alice, status="up")
@@ -37,6 +48,7 @@ class SendAlertsTestCase(BaseTestCase):
         check.save()
 
         # Expect no exceptions--
-        Command().handle_one(check)
+        self.assertTrue(Command().handle_one(check))
 
     ### Assert when Command's handle many that when handle_many should return True
+
