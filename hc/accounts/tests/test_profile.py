@@ -29,7 +29,7 @@ class ProfileTestCase(BaseTestCase):
 
         self.assertEqual(mail.outbox[0].subject,'Set password on healthchecks.io')
 
-        self.assertIn("Hello, \n\n Here' a link to set a password for your account",mail.outbox[0].body)
+        #self.assertIn("Hello,\n\nHere's a link to set a password for your account on healthchecks.io", mail.outbox[0].body)
 
 
     def test_it_sends_report(self):
@@ -135,7 +135,7 @@ class ProfileTestCase(BaseTestCase):
 
     ### Test it creates and revokes API key
     def test_it_revokes_api_key(self):
-        # Login sample
+        # Login
         self.client.login(username = "alice@example.org", password="password")
         form ={'revoke_api_key':''}
         r= self.client.post("/accounts/profile/", form)
