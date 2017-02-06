@@ -35,14 +35,14 @@ class ListChecksTestCase(BaseTestCase):
     def test_it_works(self):
         r = self.get()
         ### Assert the response status code
-        assert r.status_code == 200
+        self.assertEqual(r.status_code, 200)
 
         doc = r.json()
         self.assertTrue("checks" in doc)
 
         checks = {check["name"]: check for check in doc["checks"]}
         ### Assert the expected length of checks
-        assert len(checks) == 2
+        self.assertEqual(len(checks), 2)
 
         ### Assert the checks Alice 1 and Alice 2's timeout, grace, ping_url, status,
         ### last_ping, n_pings and pause_url
@@ -89,4 +89,4 @@ class ListChecksTestCase(BaseTestCase):
         payload = {"api_key": "abc"}
         r = self.client.post("/api/v1/checks/", json.dumps(payload), \
                              content_type="application/json")
-        assert r.status_code == 201
+        self.assertEqual(r.status_code, 201)

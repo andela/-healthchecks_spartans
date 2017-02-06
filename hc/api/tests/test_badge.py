@@ -15,8 +15,7 @@ class BadgeTestCase(BaseTestCase):
         r = self.client.get("/badge/%s/12345678/foo.svg" % self.alice.username)
         ### Assert the expected response status code
         # Status code 400 for bad request
-        self.assertEqual(r.status_code, 400, \
-            msg="Should respond wuth status code 400")
+        self.assertEqual(r.status_code, 400)
 
     def test_it_returns_svg(self):
         sig = base64_hmac(str(self.alice.username), "foo", settings.SECRET_KEY)

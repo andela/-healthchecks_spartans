@@ -14,8 +14,8 @@ class PauseTestCase(BaseTestCase):
 
         ### Assert the expected status code and check's status
         check.refresh_from_db()
-        assert r.status_code == 200
-        assert check.status == "paused"
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(check.status, "paused")
 
     def test_it_validates_ownership(self):
         check = Check(user=self.bob, status="up")
@@ -37,4 +37,4 @@ class PauseTestCase(BaseTestCase):
                              HTTP_X_API_KEY="abc")
 
         # Get request should return status code 405 "method not allowed"
-        assert r.status_code == 405
+        self.assertEqual(r.status_code, 405)

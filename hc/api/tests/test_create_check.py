@@ -15,10 +15,10 @@ class CreateCheckTestCase(BaseTestCase):
                              content_type="application/json")
 
         if expected_error:
-            assert r.status_code == 400
-            ### Assert that the expected error is the response error
+            self.assertEqual(r.status_code, 400)
+            ### self.assertEqual(that the expected error is the response error
             r = r.json()
-            assert r["error"] == expected_error
+            self.assertEqual(r["error"], expected_error)
         return r
 
     def test_it_works(self):
@@ -33,14 +33,14 @@ class CreateCheckTestCase(BaseTestCase):
         self.assertEqual(r.status_code, 201)
 
         doc = r.json()
-        assert "ping_url" in doc
+        self.assertIn("ping_url", doc)
         self.assertEqual(doc["name"], "Foo")
         self.assertEqual(doc["tags"], "bar,baz")
 
-        ### Assert the expected last_ping and n_pings values
+        ### assert that the expected last_ping and n_pings values
         check = Check()
-        assert not check.last_ping
-        assert check.n_pings == 0
+        self.assertFalse(check.last_ping)
+        self.assertEqual(check.n_pings, 0)
 
         self.assertEqual(Check.objects.count(), 1)
         check = Check.objects.get()
@@ -58,7 +58,7 @@ class CreateCheckTestCase(BaseTestCase):
         ### Make the post request and get the response
         r = self.post(payload)
 
-        assert r.status_code == 201
+        self.assertEqual(r.status_code, 201)
 
     def test_it_handles_missing_request_body(self):
         ### Make the post request with a missing body and get the response
@@ -72,7 +72,7 @@ class CreateCheckTestCase(BaseTestCase):
         r = self.client.post(self.URL, {"invalid json"}, \
                 content_type="application/json", HTTP_X_API_KEY="abc")
 
-        assert r.json()["error"] == "could not parse request body"
+        self.assertEqual(r.json()["error"], "could not parse request body")
 
     def test_it_rejects_wrong_api_key(self):
         self.post({"api_key": "wrong"},
@@ -100,8 +100,8 @@ class CreateCheckTestCase(BaseTestCase):
         channel.save()
         channel.checks.add(check)
 
-        assert channel.checks != None
-        assert channel.user == self.alice
+        self.assertNotEqual(channel.checks, None)
+        self.assertEqual(channel.user, self.alice)
 
 
     ### Test for the 'timeout is too small' and 'timeout is too large' errors
