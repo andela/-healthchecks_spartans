@@ -15,11 +15,22 @@ class ProfileTestCase(BaseTestCase):
         assert r.status_code == 302
 
         # profile.token should be set now
+
         self.alice.profile.refresh_from_db()
         token = self.alice.profile.token
-        ### Assert that the token is set
 
-        ### Assert that the email was sent and check email content
+        # Assert that the token is set
+        self.assertTrue(len(token)>10)
+
+        #Assering that the email has been sent
+        self.assertEqual(len(mail.outbox),1)
+
+        # Asserting the contents of the mail contents (subject and contents)
+
+        self.assertEqual(mail.outbox[0].subject,'Set password on healthchecks.io')
+
+        self.assertIn("Hello, \n\n Here' a link to set a password for your account",mail.outbox[0].body)
+
 
     def test_it_sends_report(self):
         check = Check(name="Test Check", user=self.alice)
