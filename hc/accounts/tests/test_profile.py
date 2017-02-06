@@ -33,14 +33,24 @@ class ProfileTestCase(BaseTestCase):
 
 
     def test_it_sends_report(self):
+
         check = Check(name="Test Check", user=self.alice)
         check.save()
 
         self.alice.profile.send_report()
 
-        ###Assert that the email was sent and check email content
+        #Assert that the email was sent
+        self.assertEqual(len(mail.outbox),1)
+
+        # Checking the subject of the email that was sent
+
+        self.assertEqual(mail.outbox[0].subject,'Monthly Report')
+
+        # Checking the content of the email that was sent
+        self.assertIn('This is a monthly report sent by healthchecks.io.',mail.outbox[0].body)
 
     def test_it_adds_team_member(self):
+
         self.client.login(username="alice@example.org", password="password")
 
         form = {"invite_team_member": "1", "email": "frank@example.org"}
@@ -54,8 +64,13 @@ class ProfileTestCase(BaseTestCase):
         ### Assert the existence of the member emails
 
         self.assertTrue("frank@example.org" in member_emails)
+        self.assertTrue("bob@example.org" in member_emails)
+        assert len(mail.outbox) > 0
 
         ###Assert that the email was sent and check email content
+        self.assertIn('frank@example.org',mail.outbox[0].to)
+        self.assertIn("You have been invited to join alice@example.org on ", mail.outbox[0].subject)
+        self.assertIn("You will be able to manage their existing monitoring checks and set up new",mail.outbox[0].body)
 
     def test_add_team_member_checks_team_access_allowed_flag(self):
         self.client.login(username="charlie@example.org", password="password")
@@ -119,3 +134,9 @@ class ProfileTestCase(BaseTestCase):
         self.assertNotContains(r, "bobs-tag.svg")
 
     ### Test it creates and revokes API key
+    def test_it_revokes_api_key(self):
+        # Login sample
+        self.client.login(username = "alice@example.org", password="password")
+        form ={'revoke_api_key':''}
+        r= self.client.post("/accounts/profile/", form)
+        self.assertEqual(r.status_code,200)
