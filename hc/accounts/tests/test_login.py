@@ -30,6 +30,8 @@ class LoginTestCase(TestCase):
         self.assertIn('To log into healthchecks.io', mail.outbox[0].body)
 
         ### Assert that check is associated with the new user
+        verify = Check.objects.get(code=check.code)
+        assert verify.user
 
     def test_it_pops_bad_link_from_session(self):
         self.client.session["bad_link"] = True
