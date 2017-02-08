@@ -30,6 +30,7 @@ class LoginTestCase(TestCase):
         self.assertIn('To log into healthchecks.io', mail.outbox[0].body)
 
         ### Assert that check is associated with the new user
+        # TODO query the new user and verify
         verify = Check.objects.get(code=check.code)
         assert verify.user
 
@@ -39,4 +40,18 @@ class LoginTestCase(TestCase):
         assert "bad_link" not in self.client.session
 
         ### Any other tests?
+    # TODO test login with fake credentials non existent user
+    # TODO non existent profile
+    #  TODO WRONG EMAIL LOGIN
+    def test_login_link_sent(self):
+        url = '/accounts/login_link_sent/'
+        r = self.client.get(url)
+        self.assertTemplateUsed(r, 'accounts/login_link_sent.html')
+
+
+
+
+
+
+
 
