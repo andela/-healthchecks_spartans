@@ -152,4 +152,4 @@ class ProfileTestCase(BaseTestCase):
         r = self.client.post("/accounts/profile/", form)
         self.assertEqual(r.status_code, 200)
         self.assertTemplateUsed(r, 'accounts/profile.html')
-        self.assertContains(r, 'API key:')
+        self.assertEqual(r.context[-1]['show_api_key'], True)
