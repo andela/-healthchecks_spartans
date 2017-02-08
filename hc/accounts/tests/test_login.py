@@ -48,6 +48,12 @@ class LoginTestCase(TestCase):
         r = self.client.get(url)
         self.assertTemplateUsed(r, 'accounts/login_link_sent.html')
 
+    def test_set_password_link_sent(self):
+        url = '/accounts/set_password_link_sent/'
+        r = self.client.get(url)
+        self.assertTemplateUsed(r, 'accounts/set_password_link_sent.html')
+
+
 
 
 
