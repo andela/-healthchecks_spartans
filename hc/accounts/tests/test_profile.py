@@ -29,8 +29,7 @@ class ProfileTestCase(BaseTestCase):
 
         self.assertEqual(mail.outbox[0].subject,'Set password on healthchecks.io')
 
-        #self.assertIn("Hello,\n\nHere's a link to set a password for your account on healthchecks.io", mail.outbox[0].body)
-
+        self.assertIn("Hello,\n\nHere's a link to set a password for your account on healthchecks.io:", mail.outbox[0].body)
 
     def test_it_sends_report(self):
 
@@ -40,14 +39,14 @@ class ProfileTestCase(BaseTestCase):
         self.alice.profile.send_report()
 
         #Assert that the email was sent
-        self.assertEqual(len(mail.outbox),1)
+        self.assertEqual(len(mail.outbox), 1)
 
         # Checking the subject of the email that was sent
 
         self.assertEqual(mail.outbox[0].subject,'Monthly Report')
 
         # Checking the content of the email that was sent
-        self.assertIn('This is a monthly report sent by healthchecks.io.',mail.outbox[0].body)
+        self.assertIn('This is a monthly report sent by healthchecks.io.', mail.outbox[0].body)
 
     def test_it_adds_team_member(self):
 
@@ -70,7 +69,7 @@ class ProfileTestCase(BaseTestCase):
         ###Assert that the email was sent and check email content
         self.assertIn('frank@example.org',mail.outbox[0].to)
         self.assertIn("You have been invited to join alice@example.org on ", mail.outbox[0].subject)
-        self.assertIn("You will be able to manage their existing monitoring checks and set up new",mail.outbox[0].body)
+        self.assertIn("You will be able to manage their existing monitoring checks and set up new", mail.outbox[0].body)
 
     def test_add_team_member_checks_team_access_allowed_flag(self):
         self.client.login(username="charlie@example.org", password="password")
@@ -139,4 +138,10 @@ class ProfileTestCase(BaseTestCase):
         self.client.login(username = "alice@example.org", password="password")
         form ={'revoke_api_key':''}
         r= self.client.post("/accounts/profile/", form)
-        self.assertEqual(r.status_code,200)
+        self.assertEqual(r.status_code, 200)
+
+    def test_create_api_key(self):
+        self.client.login(username="alice@example.org", password="password")
+        form = {'create_api_key': ''}
+        r = self.client.post("/accounts/profile/", form)
+        self.assertEqual(r.status_code, 200)
