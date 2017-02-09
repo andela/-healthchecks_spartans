@@ -161,3 +161,9 @@ class ProfileTestCase(BaseTestCase):
         form = {'update_reports_allowed': '', 'reports_allowed': '1'}
         r = self.client.post("/accounts/profile/", form)
         self.assertEqual(r.status_code, 200)
+
+    def test_unsubscribe_reports(self):
+        self.client.login(username="alice@example.org", password="password")
+        url = "/accounts/unsubscribe_reports/%s/" % self.alice.username
+        r = self.client.get(url, follow=True)
+        self.assertTemplateUsed(r, "accounts/unsubscribed.html")
