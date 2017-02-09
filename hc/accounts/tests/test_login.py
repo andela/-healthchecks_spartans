@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.test import TestCase
 from hc.api.models import Check
+from hc.accounts.models import Profile
 
 
 class LoginTestCase(TestCase):
@@ -64,6 +65,21 @@ class LoginTestCase(TestCase):
         form = {'username': 'alice@example.org', 'password': "password2"}
         r = self.client.post("/accounts/login/", form)
         self.assertTemplateUsed(r, 'accounts/login.html')
+
+    def test_login_redirects_active_user(self):
+        self.ken = User(username="ken", email="ken@example.org")
+        self.ken.set_password("password")
+        self.ken.is_active = True
+        self.ken.save()
+        self.ken_profile = Profile(user=self.ken, api_key="abc", token='')
+        self.ken_profile.team_access_allowed = True
+        self.ken_profile.save()
+        form = {'username': 'ken@example.org', 'password': "password"}
+        r = self.client.post("/accounts/login/", form)
+        self.assertEqual(r.status_code, 200)
+
+
+
 
 
 

@@ -5,7 +5,6 @@ from hc.accounts.models import Member
 from hc.api.models import Check
 from django.contrib.auth.models import User
 from hc.accounts.models import Profile
-from django.contrib.auth.hashers import make_password
 from django.core.signing import Signer
 
 
