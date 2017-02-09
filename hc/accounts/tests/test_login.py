@@ -16,11 +16,16 @@ class LoginTestCase(TestCase):
 
         form = {"email": "alice@example.org"}
 
+        # assert the user doesn't exist before post operation
+        self.assertEqual(len(User.objects.filter(email=form["email"])), 0)
+        self.initial_user_count = User.objects.count()
+
         r = self.client.post("/accounts/login/", form)
         assert r.status_code == 302
 
         ### Assert that a user was created
-        self.assertEqual(User.objects.count(), 1)
+        self.new_user_count = User.objects.count()
+        self.assertEqual(self.new_user_count - self.initial_user_count, 1)
 
         # And email sent
         self.assertEqual(len(mail.outbox), 1)
@@ -30,9 +35,9 @@ class LoginTestCase(TestCase):
         self.assertIn('To log into healthchecks.io', mail.outbox[0].body)
 
         ### Assert that check is associated with the new user
-        # TODO query the new user and verify
-        verify = Check.objects.get(code=check.code)
-        assert verify.user
+        self.test_user_list = User.objects.filter(email=form["email"])
+        self.test_check = Check.objects.get(user=self.test_user_list[0].id)
+        self.assertEqual(self.test_user_list[0].id, self.test_check.user_id)
 
     def test_it_pops_bad_link_from_session(self):
         self.client.session["bad_link"] = True
