@@ -148,6 +148,10 @@ class ProfileTestCase(BaseTestCase):
         r = self.client.post("/accounts/profile/", form)
         self.assertEqual(r.status_code, 200)
 
+        self.alice.profile.refresh_from_db()
+        api_key = self.alice.profile.api_key
+        self.assertTrue(len(api_key) > 10)
+
     def test_show_api_key(self):
         self.client.login(username="alice@example.org", password="password")
         form = {'show_api_key': ''}
