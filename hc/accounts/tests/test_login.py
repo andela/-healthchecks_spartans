@@ -45,9 +45,6 @@ class LoginTestCase(TestCase):
         assert "bad_link" not in self.client.session
 
         ### Any other tests?
-    # TODO test login with fake credentials non existent user
-    # TODO non existent profile
-    #  TODO WRONG EMAIL LOGIN
     def test_login_link_sent(self):
         url = '/accounts/login_link_sent/'
         r = self.client.get(url)
