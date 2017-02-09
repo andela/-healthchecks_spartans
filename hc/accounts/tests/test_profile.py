@@ -3,6 +3,10 @@ from django.core import mail
 from hc.test import BaseTestCase
 from hc.accounts.models import Member
 from hc.api.models import Check
+from django.contrib.auth.models import User
+from hc.accounts.models import Profile
+from django.contrib.auth.hashers import make_password
+from django.core.signing import Signer
 
 
 class ProfileTestCase(BaseTestCase):
@@ -144,17 +148,19 @@ class ProfileTestCase(BaseTestCase):
 
     def test_create_api_key(self):
         self.client.login(username="alice@example.org", password="password")
-        form = {'create_api_key': ''}
+        form = {'create_api_key': '1'}
         r = self.client.post("/accounts/profile/", form)
         self.assertEqual(r.status_code, 200)
 
         self.alice.profile.refresh_from_db()
         api_key = self.alice.profile.api_key
         self.assertTrue(len(api_key) > 10)
+        self.assertIsNotNone(api_key)
+        self.assertContains(r, "The API key has been created!")
 
     def test_show_api_key(self):
         self.client.login(username="alice@example.org", password="password")
-        form = {'show_api_key': ''}
+        form = {'show_api_key': '1'}
         r = self.client.post("/accounts/profile/", form)
         self.assertEqual(r.status_code, 200)
         self.assertTemplateUsed(r, 'accounts/profile.html')
@@ -167,7 +173,17 @@ class ProfileTestCase(BaseTestCase):
         self.assertEqual(r.status_code, 200)
 
     def test_unsubscribe_reports(self):
-        self.client.login(username="alice@example.org", password="password")
-        url = "/accounts/unsubscribe_reports/%s/" % self.alice.username
-        r = self.client.get(url, follow=True)
-        self.assertTemplateUsed(r, "accounts/unsubscribed.html")
+        self.sam = User(username="sam", email="sam@example.org")
+        self.sam.set_password("password")
+        self.sam.save()
+        self.sam_profile = Profile(user=self.sam, api_key="abc", token='')
+        signer = Signer()
+        value = signer.sign('secret-token')
+        self.sam_profile.token = value
+        self.sam_profile.team_access_allowed = True
+        self.sam_profile.save()
+        self.client.login(username="sam@example.org", password="password")
+        url = "/accounts/unsubscribe_reports/%s/" % self.sam.username
+        self.client.get(url, {'token': value})
+        self.sam_profile.refresh_from_db()
+        self.assertEqual(self.sam_profile.reports_allowed, False)
