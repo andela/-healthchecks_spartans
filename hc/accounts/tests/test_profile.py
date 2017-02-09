@@ -135,10 +135,12 @@ class ProfileTestCase(BaseTestCase):
     ### Test it creates and revokes API key
     def test_it_revokes_api_key(self):
         # Login
-        self.client.login(username = "alice@example.org", password="password")
-        form ={'revoke_api_key':''}
-        r= self.client.post("/accounts/profile/", form)
+        self.client.login(username="alice@example.org", password="password")
+        form ={'revoke_api_key': '1'}
+        r = self.client.post("/accounts/profile/", form)
         self.assertEqual(r.status_code, 200)
+        self.alice.profile.refresh_from_db()
+        self.assertEqual(self.alice.profile.api_key, "")
 
     def test_create_api_key(self):
         self.client.login(username="alice@example.org", password="password")

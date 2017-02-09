@@ -59,16 +59,3 @@ class LoginTestCase(TestCase):
         self.assertEqual(r.status_code, 200)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
