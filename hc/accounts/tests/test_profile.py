@@ -23,11 +23,11 @@ class ProfileTestCase(BaseTestCase):
         self.assertTrue(len(token)>10)
 
         #Assering that the email has been sent
-        self.assertEqual(len(mail.outbox),1)
+        self.assertEqual(len(mail.outbox), 1)
 
         # Asserting the contents of the mail contents (subject and contents)
 
-        self.assertEqual(mail.outbox[0].subject,'Set password on healthchecks.io')
+        self.assertEqual(mail.outbox[0].subject, 'Set password on healthchecks.io')
 
         self.assertIn("Hello,\n\nHere's a link to set a password for your account on healthchecks.io:", mail.outbox[0].body)
 
@@ -43,7 +43,7 @@ class ProfileTestCase(BaseTestCase):
 
         # Checking the subject of the email that was sent
 
-        self.assertEqual(mail.outbox[0].subject,'Monthly Report')
+        self.assertEqual(mail.outbox[0].subject, 'Monthly Report')
 
         # Checking the content of the email that was sent
         self.assertIn('This is a monthly report sent by healthchecks.io.', mail.outbox[0].body)
