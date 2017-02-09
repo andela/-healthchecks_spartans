@@ -60,7 +60,7 @@ class LoginTestCase(TestCase):
         r = self.client.post("/accounts/login/", form)
         self.assertEqual(r.status_code, 200)
 
-    def test_login_with_ivalid_credentials(self):
+    def test_login_with_invalid_credentials(self):
         form = {'username': 'alice@example.org', 'password': "password2"}
         r = self.client.post("/accounts/login/", form)
         self.assertTemplateUsed(r, 'accounts/login.html')
