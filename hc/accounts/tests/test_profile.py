@@ -187,3 +187,20 @@ class ProfileTestCase(BaseTestCase):
         self.client.get(url, {'token': value})
         self.sam_profile.refresh_from_db()
         self.assertEqual(self.sam_profile.reports_allowed, False)
+
+    def test_unsubscribe_reports_with_invalid_token(self):
+        self.sam = User(username="sam", email="sam@example.org")
+        self.sam.set_password("password")
+        self.sam.save()
+        self.sam_profile = Profile(user=self.sam, api_key="abc", token='')
+        signer = Signer()
+        value = signer.sign('secret-token')
+        self.sam_profile.token = value
+        self.sam_profile.team_access_allowed = True
+        self.sam_profile.save()
+        self.client.login(username="sam@example.org", password="password")
+        url = "/accounts/unsubscribe_reports/%s/" % self.sam.username
+        invalid_token = signer.sign('invalid-token')
+        self.client.get(url, {'token': invalid_token})
+        self.assertTrue(self.sam_profile.reports_allowed)
+
