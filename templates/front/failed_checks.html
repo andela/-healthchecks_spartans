@@ -9,7 +9,7 @@
     <div class="col-sm-12 col-md-8">
         <h1>
         {% if request.team == request.user.profile %}
-            My Checks
+            Failed Checks
         {% else %}
             {{ request.team.team_name }}
         {% endif %}
@@ -17,11 +17,11 @@
     </div>
     <div class="col-md-4">
         <div class="dropdown pull-right">
-            <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown">All Jobs
+            <button id="toggle-view" class="btn btn-sm btn-danger dropdown-toggle" type="button" data-toggle="dropdown">Failed Jobs
             <span class="caret"></span></button>
             <ul class="dropdown-menu">
-                <li><a href="{% url 'hc-checks' %}">All Jobs</a></li>
-                <li><a href="{% url 'hc-failed-checks' %}">Failed Jobs</a></li>
+                <li><a id="all-jobs" href="{% url 'hc-checks' %}">All Jobs</a></li>
+                <li><a id="failed-jobs" href="{% url 'hc-failed-checks' %}">Failed Jobs</a></li>
             </ul>
         </div>
     </div>
@@ -43,22 +43,12 @@
 </div>
 <div class="row">
     <div class="col-sm-12">
-
-
     {% if checks %}
         {% include "front/my_checks_mobile.html" %}
         {% include "front/my_checks_desktop.html" %}
     {% else %}
-    <div class="alert alert-info">You don't have any checks yet.</div>
+    <div class="alert alert-info">You don't have any failed checks.</div>
     {% endif %}
-    </div>
-</div>
-<div class="row">
-    <div class="col-sm-12">
-        <form method="post" action="{% url 'hc-add-check' %}" class="text-center">
-            {% csrf_token %}
-            <input type="submit" class="btn btn-primary btn-lg" value="Add Check">
-        </form>
     </div>
 </div>
 

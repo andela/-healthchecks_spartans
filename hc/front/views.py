@@ -552,3 +552,19 @@ def privacy(request):
 
 def terms(request):
     return render(request, "front/terms.html", {})
+
+def failed_checks(request):
+    """
+    Gets the failed checks that the user has been notified
+    about
+    """
+    # Checks that belong to the user or the team
+    checks = Check.objects.filter(user=request.team.user).order_by("created")
+
+    # Filter out the failed ones that the user has been notified about
+    failed_checks = []
+    for check in checks:
+        if check.get_status() == "down" and check.n_pings:
+            failed_checks.append(check)
+    return render(request, "front/failed_checks.html", \
+        {"checks": failed_checks})
