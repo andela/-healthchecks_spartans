@@ -11,12 +11,6 @@ class MyChecksTestCase(BaseTestCase):
         self.check = Check(user=self.alice, name="Alice Was Here")
         self.check.save()
 
-    def test_it_works(self):
-        for email in ("alice@example.org", "bob@example.org"):
-            self.client.login(username=email, password="password")
-            r = self.client.get("/checks/")
-            self.assertContains(r, "Alice Was Here", status_code=200)
-
     def test_failed_checks(self):
         for email in ("alice@example.org", "bob@example.org"):
             self.client.login(username=email, password="password")
