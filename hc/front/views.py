@@ -567,4 +567,4 @@ def failed_checks(request):
         if check.get_status() == "down" and check.n_pings:
             failed_checks.append(check)
     return render(request, "front/failed_checks.html", \
-        {'failed_checks': failed_checks})
+        {"checks": failed_checks})
