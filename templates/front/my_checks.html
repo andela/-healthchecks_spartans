@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-sm-12">
+    <div class="col-sm-12 col-md-8">
         <h1>
         {% if request.team == request.user.profile %}
             My Checks
@@ -15,6 +15,17 @@
         {% endif %}
         </h1>
     </div>
+    <div class="col-md-4">
+        <div class="dropdown pull-right">
+            <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown">All Jobs
+            <span class="caret"></span></button>
+            <ul class="dropdown-menu">
+                <li><a href="{% url 'hc-checks' %}">All Jobs</a></li>
+                <li><a href="{% url 'hc-failed-checks' %}">Failed Jobs</a></li>
+            </ul>
+        </div>
+    </div>
+    
     {% if tags %}
     <div id="my-checks-tags" class="col-sm-12">
         {% for tag, count in tags %}
