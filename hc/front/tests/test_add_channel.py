@@ -40,6 +40,7 @@ class AddChannelTestCase(BaseTestCase):
 
     ### Test that the team access works
     def test_team_access_works(self):
+
         self.client.login(username='alice@example.org', password='password')
 
         # Using alice to access bob's data
@@ -58,3 +59,12 @@ class AddChannelTestCase(BaseTestCase):
 
 
     ### Test that bad kinds don't work
+    def test_bad_kinds(self):
+        self.client.login(username='alice@example.org',password='password')
+
+        kind = "badKind"
+        url = "/integrations/add_%s/" % kind
+        response =self.client.get(url)
+
+        # Should not find the bad kind page
+        self.assertEqual(response.status_code, 404)
