@@ -38,33 +38,32 @@ class AddChannelTestCase(BaseTestCase):
             r = self.client.get(url)
             self.assertContains(r, "Integration Settings", status_code=200)
 
-    ### Test that the team access works
+    # Test that the team access works
     def test_team_access_works(self):
 
         self.client.login(username='alice@example.org', password='password')
 
         # Using alice to access bob's data
         url = "/accounts/switch_team/bob"
-        response =self.client.get(url)
+        response = self.client.get(url)
 
         # Checking for server communication errors
 
-        self.assertNotEqual(response.status_code,404)
-        self.assertNotEqual(response.status_code,500)
+        self.assertNotEqual(response.status_code, 404)
+        self.assertNotEqual(response.status_code, 500)
 
         # Checking for other errors in response phase
 
-        self.assertNotEqual(response.status_code,403)
-        self.assertEqual(response.status_code,301)
+        self.assertNotEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 301)
 
-
-    ### Test that bad kinds don't work
+    # Test that bad kinds don't work
     def test_bad_kinds(self):
-        self.client.login(username='alice@example.org',password='password')
+        self.client.login(username='alice@example.org', password='password')
 
         kind = "badKind"
         url = "/integrations/add_%s/" % kind
-        response =self.client.get(url)
+        response = self.client.get(url)
 
         # Should not find the bad kind page
         self.assertEqual(response.status_code, 404)
