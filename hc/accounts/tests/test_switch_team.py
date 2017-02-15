@@ -32,3 +32,10 @@ class SwitchTeamTestCase(BaseTestCase):
         r = self.client.get(url, follow=True)
         ### Assert the expected error code
         self.assertRedirects(r, "/checks/", 302, 200)
+
+    def test_it_handles_invalid_username(self):
+        self.client.login(username="alice@example.org", password="password")
+
+        url = "/accounts/switch_team/bob/"
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, 403)

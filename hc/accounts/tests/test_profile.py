@@ -3,6 +3,9 @@ from django.core import mail
 from hc.test import BaseTestCase
 from hc.accounts.models import Member
 from hc.api.models import Check
+from django.contrib.auth.models import User
+from hc.accounts.models import Profile
+from django.core.signing import Signer
 
 
 class ProfileTestCase(BaseTestCase):
@@ -23,14 +26,11 @@ class ProfileTestCase(BaseTestCase):
         self.assertTrue(len(token)>10)
 
         #Assering that the email has been sent
-        self.assertEqual(len(mail.outbox),1)
+        self.assertEqual(len(mail.outbox), 1)
 
         # Asserting the contents of the mail contents (subject and contents)
-
-        self.assertEqual(mail.outbox[0].subject,'Set password on healthchecks.io')
-
+        self.assertEqual(mail.outbox[0].subject, 'Set password on healthchecks.io')
         self.assertIn("Hello,\n\nHere's a link to set a password for your account on healthchecks.io:", mail.outbox[0].body)
-
 
     def test_it_sends_report(self):
 
@@ -39,15 +39,16 @@ class ProfileTestCase(BaseTestCase):
 
         self.alice.profile.send_report()
 
-        #Assert that the email was sent
-        self.assertEqual(len(mail.outbox),1)
+        # Assert that the email was sent
+
+        self.assertEqual(len(mail.outbox), 1)
 
         # Checking the subject of the email that was sent
 
-        self.assertEqual(mail.outbox[0].subject,'Monthly Report')
+        self.assertEqual(mail.outbox[0].subject, 'Monthly Report')
 
         # Checking the content of the email that was sent
-        self.assertIn('This is a monthly report sent by healthchecks.io.',mail.outbox[0].body)
+        self.assertIn('This is a monthly report sent by healthchecks.io.', mail.outbox[0].body)
 
     def test_it_adds_team_member(self):
 
@@ -70,7 +71,7 @@ class ProfileTestCase(BaseTestCase):
         ###Assert that the email was sent and check email content
         self.assertIn('frank@example.org',mail.outbox[0].to)
         self.assertIn("You have been invited to join alice@example.org on ", mail.outbox[0].subject)
-        self.assertIn("You will be able to manage their existing monitoring checks and set up new",mail.outbox[0].body)
+        self.assertIn("You will be able to manage their existing monitoring checks and set up new", mail.outbox[0].body)
 
     def test_add_team_member_checks_team_access_allowed_flag(self):
         self.client.login(username="charlie@example.org", password="password")
@@ -136,7 +137,82 @@ class ProfileTestCase(BaseTestCase):
     ### Test it creates and revokes API key
     def test_it_revokes_api_key(self):
         # Login
-        self.client.login(username = "alice@example.org", password="password")
-        form ={'revoke_api_key':''}
-        r= self.client.post("/accounts/profile/", form)
-        self.assertEqual(r.status_code,200)
+        self.client.login(username="alice@example.org", password="password")
+        form ={'revoke_api_key': '1'}
+        r = self.client.post("/accounts/profile/", form)
+        self.assertEqual(r.status_code, 200)
+        self.alice.profile.refresh_from_db()
+        self.assertEqual(self.alice.profile.api_key, "")
+
+    def test_create_api_key(self):
+        self.client.login(username="alice@example.org", password="password")
+        form = {'create_api_key': '1'}
+        r = self.client.post("/accounts/profile/", form)
+        self.assertEqual(r.status_code, 200)
+
+        self.alice.profile.refresh_from_db()
+        api_key = self.alice.profile.api_key
+        self.assertTrue(len(api_key) > 10)
+        self.assertIsNotNone(api_key)
+        self.assertContains(r, "The API key has been created!")
+
+    def test_show_api_key(self):
+        self.client.login(username="alice@example.org", password="password")
+        form = {'show_api_key': '1'}
+        r = self.client.post("/accounts/profile/", form)
+        self.assertEqual(r.status_code, 200)
+        self.assertTemplateUsed(r, 'accounts/profile.html')
+        self.assertEqual(r.context[-1]['show_api_key'], True)
+
+    def test_update_reports_allowed(self):
+        self.client.login(username="alice@example.org", password="password")
+        form = {'update_reports_allowed': '', 'reports_allowed': '1'}
+        r = self.client.post("/accounts/profile/", form)
+        self.assertEqual(r.status_code, 200)
+
+    def test_unsubscribe_reports(self):
+        self.sam = User(username="sam", email="sam@example.org")
+        self.sam.set_password("password")
+        self.sam.save()
+        self.sam_profile = Profile(user=self.sam, api_key="abc", token='')
+        signer = Signer()
+        value = signer.sign('secret-token')
+        self.sam_profile.token = value
+        self.sam_profile.team_access_allowed = True
+        self.sam_profile.save()
+        self.client.login(username="sam@example.org", password="password")
+        url = "/accounts/unsubscribe_reports/%s/" % self.sam.username
+        self.client.get(url, {'token': value})
+        self.sam_profile.refresh_from_db()
+        self.assertEqual(self.sam_profile.reports_allowed, False)
+
+    def test_unsubscribe_reports_with_invalid_token(self):
+        self.sam = User(username="sam", email="sam@example.org")
+        self.sam.set_password("password")
+        self.sam.save()
+        self.sam_profile = Profile(user=self.sam, api_key="abc", token='')
+        signer = Signer()
+        value = signer.sign('secret-token')
+        self.sam_profile.token = value
+        self.sam_profile.team_access_allowed = True
+        self.sam_profile.save()
+        self.client.login(username="sam@example.org", password="password")
+        url = "/accounts/unsubscribe_reports/%s/" % self.sam.username
+        invalid_token = signer.sign('invalid-token')
+        self.client.get(url, {'token': invalid_token})
+        self.assertTrue(self.sam_profile.reports_allowed)
+
+    def test_unsubscribe_reports_with_bad_signature(self):
+        self.sam = User(username="sam", email="sam@example.org")
+        self.sam.set_password("password")
+        self.sam.save()
+        self.sam_profile = Profile(user=self.sam, api_key="abc", token='')
+        signer = Signer()
+        value = signer.sign('secret-token')
+        self.sam_profile.token = value
+        self.sam_profile.team_access_allowed = True
+        self.sam_profile.save()
+        self.client.login(username="sam@example.org", password="password")
+        url = "/accounts/unsubscribe_reports/%s/" % self.sam.username
+        r = self.client.get(url, {'token': 'secret-token'})
+        self.assertEqual(r.status_code, 400)

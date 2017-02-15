@@ -35,3 +35,11 @@ class CheckTokenTestCase(BaseTestCase):
         self.assertRedirects(r, '/accounts/login/', 302)
 
     ### Any other tests?
+    def test_logout_redirects(self):
+        url = '/accounts/logout/'
+        r = self.client.get(url)
+        self.assertRedirects(r, '/', 302)
+
+
+
+
