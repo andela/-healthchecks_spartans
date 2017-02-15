@@ -24,7 +24,8 @@ class LoginTestCase(TestCase):
         r = self.client.post("/accounts/login/", form)
         assert r.status_code == 302
 
-        ### Assert that a user was created
+        # Assert that a user was created
+
         self.new_user_count = User.objects.count()
         self.assertEqual(self.new_user_count - self.initial_user_count, 1)
 
@@ -32,10 +33,10 @@ class LoginTestCase(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Log in to healthchecks.io')
 
-        ### Assert contents of the email body
+        # Assert contents of the email body
         self.assertIn('To log into healthchecks.io', mail.outbox[0].body)
 
-        ### Assert that check is associated with the new user
+        # Assert that check is associated with the new user
         self.test_user_list = User.objects.filter(email=form["email"])
         self.test_check = Check.objects.get(user=self.test_user_list[0].id)
         self.assertEqual(self.test_user_list[0].id, self.test_check.user_id)
@@ -77,11 +78,3 @@ class LoginTestCase(TestCase):
         form = {'username': 'ken@example.org', 'password': "password"}
         r = self.client.post("/accounts/login/", form)
         self.assertEqual(r.status_code, 200)
-
-
-
-
-
-
-
-

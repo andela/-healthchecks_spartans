@@ -39,7 +39,8 @@ class ProfileTestCase(BaseTestCase):
 
         self.alice.profile.send_report()
 
-        #Assert that the email was sent
+        # Assert that the email was sent
+
         self.assertEqual(len(mail.outbox), 1)
 
         # Checking the subject of the email that was sent
@@ -215,4 +216,3 @@ class ProfileTestCase(BaseTestCase):
         url = "/accounts/unsubscribe_reports/%s/" % self.sam.username
         r = self.client.get(url, {'token': 'secret-token'})
         self.assertEqual(r.status_code, 400)
-
