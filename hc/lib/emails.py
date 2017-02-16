@@ -25,4 +25,9 @@ def verify_email(to, ctx):
 
 
 def report(to, ctx):
-    send("report", to, ctx)
+    if ctx["interval"] == "Daily":
+        send("reportdaily", to, ctx)
+    elif ctx["interval"] == "Weekly":
+        send("reportweekly", to, ctx)
+    elif ctx["interval"] == "Monthly":
+        send("report", to, ctx)
