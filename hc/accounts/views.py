@@ -162,6 +162,8 @@ def profile(request):
                     profile.reports_allowed = "2"
                 elif request.POST.get("reports_allowed") == "3":
                     profile.reports_allowed = "3"
+                else:
+                    profile.reports_allowed = "0"
                 profile.save()
                 messages.success(request, "Your settings have been updated!")
         elif "invite_team_member" in request.POST:
