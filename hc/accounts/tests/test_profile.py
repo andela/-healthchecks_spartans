@@ -44,10 +44,10 @@ class ProfileTestCase(BaseTestCase):
 
         # Checking the subject of the email that was sent
 
-        self.assertEqual(mail.outbox[0].subject, 'Monthly Report')
+        self.assertEqual(mail.outbox[0].subject, 'Daily Report')
 
         # Checking the content of the email that was sent
-        self.assertIn('This is a monthly report sent by healthchecks.io.', mail.outbox[0].body)
+        self.assertIn('This is a Daily report sent by healthchecks.io.', mail.outbox[0].body)
 
     def test_it_adds_team_member(self):
 
@@ -197,7 +197,7 @@ class ProfileTestCase(BaseTestCase):
         self.sam_profile.save()
         self.client.login(username="sam@example.org", password="password")
         url = "/accounts/unsubscribe_reports/%s/" % self.sam.username
-        invalid_token = signer.sign('invalid-token')
+        invalid_token = signer.sign('itoken')
         self.client.get(url, {'token': invalid_token})
         self.assertTrue(self.sam_profile.reports_allowed)
 
