@@ -15,8 +15,8 @@ def num_pinged_checks(profile):
 
 
 class Command(BaseCommand):
-    help = 'Send due monthly reports'
-    tmpl = "Sending monthly report to %s"
+    help = 'Send due periodic reports'
+    tmpl = "Sending periodic report to %s"
 
     def add_arguments(self, parser):
         parser.add_argument(
