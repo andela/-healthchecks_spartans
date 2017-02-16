@@ -48,6 +48,13 @@
                             value = "3"
                         {% if profile.reports_allowed == "3" %} checked {% endif %}> Each day send me a summary of my checks
 					</label>
+                    <label>
+						<input
+                            name="reports_allowed"
+                            type="radio"
+                            value = "0"
+                        {% if profile.reports_allowed == "0" %} checked {% endif %}> Do not send me Periodic reports
+					</label>
                     <button
                         name="update_reports_allowed"
                         type="submit"
