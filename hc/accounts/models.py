@@ -58,15 +58,15 @@ class Profile(models.Model):
         interval = ""
         now = timezone.now()
         if self.reports_allowed == "1":
-            self.next_report_date = now + timedelta(minutes=3)
+            self.next_report_date = now + timedelta(days=30)
             interval = "Monthly"
             reports = "Monthly Reports"
         elif self.reports_allowed == "2":
-            self.next_report_date = now + timedelta(minutes=2)
+            self.next_report_date = now + timedelta(days=7)
             interval = "Weekly"
             reports = "Weekly Reports"
         else:
-            self.next_report_date = now + timedelta(minutes=1)
+            self.next_report_date = now + timedelta(days=1)
             interval = "Daily"
             reports = "Daily Reports"
 
