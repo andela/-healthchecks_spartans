@@ -156,11 +156,11 @@ def profile(request):
         elif "update_reports_allowed" in request.POST:
             form = ReportSettingsForm(request.POST)
             if form.is_valid():
-                if request.form.get("reports_allowed") == "1":
+                if request.POST.get("reports_allowed") == "1":
                     profile.reports_allowed = "1"
-                elif request.form.get("reports_allowed") == "2":
+                elif request.POST.get("reports_allowed") == "2":
                     profile.reports_allowed = "2"
-                elif request.form.get("reports_allowed") == "3":
+                elif request.POST.get("reports_allowed") == "3":
                     profile.reports_allowed = "3"
                 profile.save()
                 messages.success(request, "Your settings have been updated!")
