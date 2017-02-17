@@ -260,7 +260,7 @@ def unsubscribe_reports(request, username):
         return HttpResponseBadRequest()
 
     user = User.objects.get(username=username)
-    user.profile.reports_allowed = False
+    user.profile.reports_allowed = 0
     user.profile.save()
 
     return render(request, "accounts/unsubscribed.html")
