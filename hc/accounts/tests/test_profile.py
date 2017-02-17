@@ -163,11 +163,29 @@ class ProfileTestCase(BaseTestCase):
         self.assertTemplateUsed(r, 'accounts/profile.html')
         self.assertEqual(r.context[-1]['show_api_key'], True)
 
-    def test_update_reports_allowed(self):
+    def test_update_reports_allowed_daily(self):
         self.client.login(username="alice@example.org", password="password")
-        form = {'update_reports_allowed': '', 'reports_allowed': '1'}
+        form = {'update_reports_allowed': '', 'reports_allowed': 1}
         r = self.client.post("/accounts/profile/", form)
         self.assertEqual(r.status_code, 200)
+        self.alice.profile.refresh_from_db()
+        self.assertEqual(self.alice.profile.reports_allowed, '1')
+
+    def test_update_reports_allowed_weekly(self):
+        self.client.login(username="alice@example.org", password="password")
+        form = {'update_reports_allowed': '', 'reports_allowed': '2'}
+        r = self.client.post("/accounts/profile/", form)
+        self.assertEqual(r.status_code, 200)
+        self.alice.profile.refresh_from_db()
+        self.assertEqual(self.alice.profile.reports_allowed, '2')
+
+    def test_update_reports_allowed_monthly(self):
+        self.client.login(username="alice@example.org", password="password")
+        form = {'update_reports_allowed': '', 'reports_allowed': '3'}
+        r = self.client.post("/accounts/profile/", form)
+        self.assertEqual(r.status_code, 200)
+        self.alice.profile.refresh_from_db()
+        self.assertEqual(self.alice.profile.reports_allowed, '3')
 
     def test_unsubscribe_reports(self):
         self.sam = User(username="sam", email="sam@example.org")
