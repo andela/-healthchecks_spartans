@@ -32,10 +32,11 @@ class ProfileTestCase(BaseTestCase):
         self.assertEqual(mail.outbox[0].subject, 'Set password on healthchecks.io')
         self.assertIn("Hello,\n\nHere's a link to set a password for your account on healthchecks.io:", mail.outbox[0].body)
 
-    def test_it_sends_report(self):
+    def test_it_sends_daily_report(self):
 
         check = Check(name="Test Check", user=self.alice)
         check.save()
+        self.alice.profile.reports_allowed = "3"
 
         self.alice.profile.send_report()
 
@@ -48,6 +49,40 @@ class ProfileTestCase(BaseTestCase):
 
         # Checking the content of the email that was sent
         self.assertIn('This is a Daily report sent by healthchecks.io.', mail.outbox[0].body)
+    def test_it_sends_weekly_report(self):
+
+        check = Check(name="Test Check", user=self.alice)
+        check.save()
+        self.alice.profile.reports_allowed = "2"
+
+        self.alice.profile.send_report()
+
+        #Assert that the email was sent
+        self.assertEqual(len(mail.outbox), 1)
+
+        # Checking the subject of the email that was sent
+
+        self.assertEqual(mail.outbox[0].subject, 'Weekly Report')
+
+        # Checking the content of the email that was sent
+        self.assertIn('This is a Weekly report sent by healthchecks.io.', mail.outbox[0].body)
+    def test_it_sends_monthly_report(self):
+
+        check = Check(name="Test Check", user=self.alice)
+        check.save()
+        self.alice.profile.reports_allowed = "1"
+
+        self.alice.profile.send_report()
+
+        #Assert that the email was sent
+        self.assertEqual(len(mail.outbox), 1)
+
+        # Checking the subject of the email that was sent
+
+        self.assertEqual(mail.outbox[0].subject, 'Monthly Report')
+
+        # Checking the content of the email that was sent
+        self.assertIn('This is a Monthly report sent by healthchecks.io.', mail.outbox[0].body)
 
     def test_it_adds_team_member(self):
 
