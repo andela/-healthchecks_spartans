@@ -187,6 +187,14 @@ class ProfileTestCase(BaseTestCase):
         self.alice.profile.refresh_from_db()
         self.assertEqual(self.alice.profile.reports_allowed, '3')
 
+    def test_disable_reports(self):
+        self.client.login(username="alice@example.org", password="password")
+        form = {'update_reports_allowed': '', 'reports_allowed': '0'}
+        r = self.client.post("/accounts/profile/", form)
+        self.assertEqual(r.status_code, 200)
+        self.alice.profile.refresh_from_db()
+        self.assertEqual(self.alice.profile.reports_allowed, '0')
+
     def test_unsubscribe_reports(self):
         self.sam = User(username="sam", email="sam@example.org")
         self.sam.set_password("password")
