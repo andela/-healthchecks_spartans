@@ -6,7 +6,8 @@ from hc.api.models import Check
 from django.contrib.auth.models import User
 from hc.accounts.models import Profile
 from django.core.signing import Signer
-
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import check_password
 
 class ProfileTestCase(BaseTestCase):
 
@@ -23,7 +24,7 @@ class ProfileTestCase(BaseTestCase):
         token = self.alice.profile.token
 
         # Assert that the token is set
-        self.assertTrue(len(token)>10)
+        self.assertTrue(len(token) > 10)
 
         #Assering that the email has been sent
         self.assertEqual(len(mail.outbox), 1)
@@ -276,4 +277,38 @@ class ProfileTestCase(BaseTestCase):
         url = "/accounts/unsubscribe_reports/%s/" % self.sam.username
         r = self.client.get(url, {'token': 'secret-token'})
         self.assertEqual(r.status_code, 400)
+
+    def test_it_set_password(self):
+        self.profile.token = make_password("secret-token")
+        self.profile.save()
+        self.client.login(username="alice@example.org", password="password")
+        url = "/accounts/set_password/secret-token/"
+        r = self.client.post(url)
+        self.assertContains(r, "Set a Password")
+        self.assertTemplateUsed(r, "accounts/set_password.html")
+
+    def test_set_password_with_invalid_token(self):
+        self.profile.token = make_password("secret-token")
+        self.profile.save()
+        self.client.login(username="alice@example.org", password="password")
+        url = "/accounts/set_password/invalid/"
+        r = self.client.post(url)
+        self.assertEqual(r.status_code, 400)
+
+    def test_set_password_redirects(self):
+        self.profile.token = make_password("secret-token")
+        self.profile.save()
+        self.client.login(username="alice@example.org", password="password")
+        form = {"password": "password2"}
+        url = "/accounts/set_password/secret-token/"
+        r = self.client.post(url, form)
+        self.assertRedirects(r, "/accounts/profile/")
+
+
+
+
+
+
+
+
 
