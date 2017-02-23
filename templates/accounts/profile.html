@@ -22,44 +22,28 @@
     <div class="col-sm-6">
         <div class="panel panel-default">
             <div class="panel-body settings-block">
-                <form method="post">
-                    {% csrf_token %}
-                    <h2>Reports</h2>
-                    <label>
-                        <input
-                            name="reports_allowed"
-                            type="radio"
-                            value ="1"
-                        {% if profile.reports_allowed == "1" %} checked {% endif %}> Each month send me a summary of my checks
-                    </label>
-					<br />
-					<label>
-						<input
-                            name="reports_allowed"
-                            type="radio"
-                            value = "2"
-                        {% if profile.reports_allowed == "2" %} checked {% endif %}>  Each week send me a summary of my checks
-					</label>
-					<br />
-					<label>
-						<input
-                            name="reports_allowed"
-                            type="radio"
-                            value = "3"
-                        {% if profile.reports_allowed == "3" %} checked {% endif %}> Each day send me a summary of my checks
-					</label>
-                    <label>
-						<input
-                            name="reports_allowed"
-                            type="radio"
-                            value = "0"
-                        {% if profile.reports_allowed == "0" %} checked {% endif %}> Do not send me Periodic reports
-					</label>
-                    <button
-                        name="update_reports_allowed"
-                        type="submit"
-                        class="btn btn-default pull-right">Save</button>
-                </form>
+                <h2>Reports</h2>
+                {% if profile.reports_allowed == ACCEPT_DAILY_REPORTS %}
+                        <span class="icon-ok"></span>
+                            Daily Schedule is currently enabled.
+                {% endif %}
+                {% if profile.reports_allowed == ACCEPT_WEEKLY_REPORTS %}
+                    <span class="icon-ok"></span>
+                            Weekly Schedule is currently enabled.
+                {% endif %}
+                {% if profile.reports_allowed == ACCEPT_MONTHLY_REPORTS %}
+                    <span class="icon-ok"></span>
+                            Monthly Schedule is currently enabled.
+                {% endif %}
+                {% if profile.reports_allowed == UNSUBSCRIBE_REPORTS %}
+                    <span class="icon-paused"></span>
+                            Periodic reports is currently disabled.
+                {% endif %}
+                <button
+                            data-toggle="modal"
+                            data-target="#change-reports-schedule-modal"
+                            class="btn btn-default pull-right">Change Schedule</button>
+
             </div>
         </div>
     </div>
@@ -208,7 +192,31 @@
 </div>
 {% endif %}
 
-
+<div id="change-reports-schedule-modal" class="modal">
+    <div class="modal-dialog">
+        <form id="reports-form" method="post">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="remove-check-title">Report Schedule</h4>
+                </div>
+                <div class="modal-body">
+                    <p>You are about to change the current report schedule.</p>
+                    {{ form }}
+                    <p>Are you sure?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button
+                        name="update_reports_allowed"
+                        type="submit"
+                        class="btn btn-primary pull-right">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
 <div id="revoke-api-key-modal" class="modal">
     <div class="modal-dialog">
