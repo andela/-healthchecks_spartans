@@ -14,7 +14,8 @@ from django.shortcuts import redirect, render
 from hc.accounts.forms import (EmailPasswordForm, InviteTeamMemberForm,
                                RemoveTeamMemberForm, ReportSettingsForm,
                                SetPasswordForm, TeamNameForm)
-from hc.accounts.models import Profile, Member
+from hc.accounts.models import Profile, Member, ACCEPT_DAILY_REPORTS, ACCEPT_WEEKLY_REPORTS, ACCEPT_MONTHLY_REPORTS,\
+    UNSUBSCRIBE_REPORTS
 from hc.api.models import Channel, Check
 from hc.lib.badges import get_badge_url
 
@@ -156,14 +157,7 @@ def profile(request):
         elif "update_reports_allowed" in request.POST:
             form = ReportSettingsForm(request.POST)
             if form.is_valid():
-                if request.POST.get("reports_allowed") == "1":
-                    profile.reports_allowed = "1"
-                elif request.POST.get("reports_allowed") == "2":
-                    profile.reports_allowed = "2"
-                elif request.POST.get("reports_allowed") == "3":
-                    profile.reports_allowed = "3"
-                else:
-                    profile.reports_allowed = "0"
+                profile.reports_allowed = form.cleaned_data["reports_allowed"]
                 profile.save()
                 messages.success(request, "Your settings have been updated!")
         elif "invite_team_member" in request.POST:
@@ -216,11 +210,18 @@ def profile(request):
 
         badge_urls.append(get_badge_url(username, tag))
 
+    form = ReportSettingsForm()
+
     ctx = {
         "page": "profile",
         "badge_urls": badge_urls,
         "profile": profile,
-        "show_api_key": show_api_key
+        "show_api_key": show_api_key,
+        "ACCEPT_DAILY_REPORTS": ACCEPT_DAILY_REPORTS,
+        "ACCEPT_WEEKLY_REPORTS": ACCEPT_WEEKLY_REPORTS,
+        "ACCEPT_MONTHLY_REPORTS": ACCEPT_MONTHLY_REPORTS,
+        "UNSUBSCRIBE_REPORTS": UNSUBSCRIBE_REPORTS,
+        "form": form
     }
 
     return render(request, "accounts/profile.html", ctx)
@@ -228,7 +229,7 @@ def profile(request):
 
 @login_required
 def set_password(request, token):
-    profile = request.user.profile
+    profile = request.user.profilec
     if not check_password(token, profile.token):
         return HttpResponseBadRequest()
 
@@ -260,7 +261,7 @@ def unsubscribe_reports(request, username):
         return HttpResponseBadRequest()
 
     user = User.objects.get(username=username)
-    user.profile.reports_allowed = 0
+    user.profile.reports_allowed = UNSUBSCRIBE_REPORTS
     user.profile.save()
 
     return render(request, "accounts/unsubscribed.html")
