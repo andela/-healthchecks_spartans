@@ -203,7 +203,11 @@
                 </div>
                 <div class="modal-body">
                     <p>You are about to change the current report schedule.</p>
-                    {{ form }}
+{#                    {{ form }}#}
+                    {% for choice in form.reports_allowed %}
+                        <div class="row" style="display:inline-block;"><div>{{ choice.tag }}</div>
+                            <div>{{ choice.choice_label }}</div></div>
+                    {% endfor %}
                     <p>Are you sure?</p>
                 </div>
                 <div class="modal-footer">
