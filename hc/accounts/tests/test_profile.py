@@ -6,7 +6,9 @@ from hc.api.models import Check
 from django.contrib.auth.models import User
 from hc.accounts.models import Profile
 from django.core.signing import Signer
-
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import check_password
+from hc.accounts.models import ACCEPT_DAILY_REPORTS, ACCEPT_WEEKLY_REPORTS, ACCEPT_MONTHLY_REPORTS, UNSUBSCRIBE_REPORTS
 
 class ProfileTestCase(BaseTestCase):
 
@@ -23,7 +25,7 @@ class ProfileTestCase(BaseTestCase):
         token = self.alice.profile.token
 
         # Assert that the token is set
-        self.assertTrue(len(token)>10)
+        self.assertTrue(len(token) > 10)
 
         #Assering that the email has been sent
         self.assertEqual(len(mail.outbox), 1)
@@ -32,10 +34,46 @@ class ProfileTestCase(BaseTestCase):
         self.assertEqual(mail.outbox[0].subject, 'Set password on healthchecks.io')
         self.assertIn("Hello,\n\nHere's a link to set a password for your account on healthchecks.io:", mail.outbox[0].body)
 
-    def test_it_sends_report(self):
+    def test_it_sends_daily_report(self):
 
         check = Check(name="Test Check", user=self.alice)
         check.save()
+        self.alice.profile.reports_allowed = ACCEPT_DAILY_REPORTS
+
+        self.alice.profile.send_report()
+
+        #Assert that the email was sent
+        self.assertEqual(len(mail.outbox), 1)
+
+        # Checking the subject of the email that was sent
+
+        self.assertEqual(mail.outbox[0].subject, 'Daily Report')
+
+        # Checking the content of the email that was sent
+        self.assertIn('This is a Daily report sent by healthchecks.io.', mail.outbox[0].body)
+
+    def test_it_sends_weekly_report(self):
+
+        check = Check(name="Test Check", user=self.alice)
+        check.save()
+        self.alice.profile.reports_allowed = ACCEPT_WEEKLY_REPORTS
+
+        self.alice.profile.send_report()
+
+        #Assert that the email was sent
+        self.assertEqual(len(mail.outbox), 1)
+
+        # Checking the subject of the email that was sent
+
+        self.assertEqual(mail.outbox[0].subject, 'Weekly Report')
+
+        # Checking the content of the email that was sent
+        self.assertIn('This is a Weekly report sent by healthchecks.io.', mail.outbox[0].body)
+    def test_it_sends_monthly_report(self):
+
+        check = Check(name="Test Check", user=self.alice)
+        check.save()
+        self.alice.profile.reports_allowed = ACCEPT_MONTHLY_REPORTS
 
         self.alice.profile.send_report()
 
@@ -47,7 +85,7 @@ class ProfileTestCase(BaseTestCase):
         self.assertEqual(mail.outbox[0].subject, 'Monthly Report')
 
         # Checking the content of the email that was sent
-        self.assertIn('This is a monthly report sent by healthchecks.io.', mail.outbox[0].body)
+        self.assertIn('This is a Monthly report sent by healthchecks.io.', mail.outbox[0].body)
 
     def test_it_adds_team_member(self):
 
@@ -163,11 +201,37 @@ class ProfileTestCase(BaseTestCase):
         self.assertTemplateUsed(r, 'accounts/profile.html')
         self.assertEqual(r.context[-1]['show_api_key'], True)
 
-    def test_update_reports_allowed(self):
+    def test_update_reports_allowed_daily(self):
         self.client.login(username="alice@example.org", password="password")
-        form = {'update_reports_allowed': '', 'reports_allowed': '1'}
+        form = {'update_reports_allowed': '', 'reports_allowed': ACCEPT_MONTHLY_REPORTS}
         r = self.client.post("/accounts/profile/", form)
         self.assertEqual(r.status_code, 200)
+        self.alice.profile.refresh_from_db()
+        self.assertEqual(self.alice.profile.reports_allowed, ACCEPT_MONTHLY_REPORTS)
+
+    def test_update_reports_allowed_weekly(self):
+        self.client.login(username="alice@example.org", password="password")
+        form = {'update_reports_allowed': '', 'reports_allowed': ACCEPT_WEEKLY_REPORTS}
+        r = self.client.post("/accounts/profile/", form)
+        self.assertEqual(r.status_code, 200)
+        self.alice.profile.refresh_from_db()
+        self.assertEqual(self.alice.profile.reports_allowed, ACCEPT_WEEKLY_REPORTS)
+
+    def test_update_reports_allowed_monthly(self):
+        self.client.login(username="alice@example.org", password="password")
+        form = {'update_reports_allowed': '', 'reports_allowed': ACCEPT_DAILY_REPORTS}
+        r = self.client.post("/accounts/profile/", form)
+        self.assertEqual(r.status_code, 200)
+        self.alice.profile.refresh_from_db()
+        self.assertEqual(self.alice.profile.reports_allowed, ACCEPT_DAILY_REPORTS)
+
+    def test_disable_reports(self):
+        self.client.login(username="alice@example.org", password="password")
+        form = {'update_reports_allowed': '', 'reports_allowed': UNSUBSCRIBE_REPORTS}
+        r = self.client.post("/accounts/profile/", form)
+        self.assertEqual(r.status_code, 200)
+        self.alice.profile.refresh_from_db()
+        self.assertEqual(self.alice.profile.reports_allowed, UNSUBSCRIBE_REPORTS)
 
     def test_unsubscribe_reports(self):
         self.sam = User(username="sam", email="sam@example.org")
@@ -183,7 +247,7 @@ class ProfileTestCase(BaseTestCase):
         url = "/accounts/unsubscribe_reports/%s/" % self.sam.username
         self.client.get(url, {'token': value})
         self.sam_profile.refresh_from_db()
-        self.assertEqual(self.sam_profile.reports_allowed, False)
+        self.assertEqual(self.sam_profile.reports_allowed, UNSUBSCRIBE_REPORTS)
 
     def test_unsubscribe_reports_with_invalid_token(self):
         self.sam = User(username="sam", email="sam@example.org")
@@ -199,7 +263,7 @@ class ProfileTestCase(BaseTestCase):
         url = "/accounts/unsubscribe_reports/%s/" % self.sam.username
         invalid_token = signer.sign('invalid-token')
         self.client.get(url, {'token': invalid_token})
-        self.assertTrue(self.sam_profile.reports_allowed)
+        self.assertEqual(self.sam_profile.reports_allowed, UNSUBSCRIBE_REPORTS)
 
     def test_unsubscribe_reports_with_bad_signature(self):
         self.sam = User(username="sam", email="sam@example.org")
@@ -215,4 +279,38 @@ class ProfileTestCase(BaseTestCase):
         url = "/accounts/unsubscribe_reports/%s/" % self.sam.username
         r = self.client.get(url, {'token': 'secret-token'})
         self.assertEqual(r.status_code, 400)
+
+    def test_it_set_password(self):
+        self.profile.token = make_password("secret-token")
+        self.profile.save()
+        self.client.login(username="alice@example.org", password="password")
+        url = "/accounts/set_password/secret-token/"
+        r = self.client.post(url)
+        self.assertContains(r, "Set a Password")
+        self.assertTemplateUsed(r, "accounts/set_password.html")
+
+    def test_set_password_with_invalid_token(self):
+        self.profile.token = make_password("secret-token")
+        self.profile.save()
+        self.client.login(username="alice@example.org", password="password")
+        url = "/accounts/set_password/invalid/"
+        r = self.client.post(url)
+        self.assertEqual(r.status_code, 400)
+
+    def test_set_password_redirects(self):
+        self.profile.token = make_password("secret-token")
+        self.profile.save()
+        self.client.login(username="alice@example.org", password="password")
+        form = {"password": "password2"}
+        url = "/accounts/set_password/secret-token/"
+        r = self.client.post(url, form)
+        self.assertRedirects(r, "/accounts/profile/")
+
+
+
+
+
+
+
+
 

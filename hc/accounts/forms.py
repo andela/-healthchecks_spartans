@@ -1,4 +1,5 @@
 from django import forms
+from hc.accounts.models import ACCEPT_DAILY_REPORTS, ACCEPT_WEEKLY_REPORTS, ACCEPT_MONTHLY_REPORTS, UNSUBSCRIBE_REPORTS
 
 
 class LowercaseEmailField(forms.EmailField):
@@ -14,7 +15,11 @@ class EmailPasswordForm(forms.Form):
 
 
 class ReportSettingsForm(forms.Form):
-    reports_allowed = forms.BooleanField(required=False)
+    CHOICES = ((ACCEPT_DAILY_REPORTS, 'Each day send me a summary of my checks',),
+               (ACCEPT_WEEKLY_REPORTS, 'Each week send me a summary of my checks',),
+               (ACCEPT_MONTHLY_REPORTS, 'Each month send me a summary of my checks',),
+               (UNSUBSCRIBE_REPORTS, 'Do not send me Periodic reports',))
+    reports_allowed = forms.ChoiceField(widget=forms.RadioSelect, choices=CHOICES)
 
 
 class SetPasswordForm(forms.Form):

@@ -14,7 +14,8 @@ from django.shortcuts import redirect, render
 from hc.accounts.forms import (EmailPasswordForm, InviteTeamMemberForm,
                                RemoveTeamMemberForm, ReportSettingsForm,
                                SetPasswordForm, TeamNameForm)
-from hc.accounts.models import Profile, Member
+from hc.accounts.models import Profile, Member, ACCEPT_DAILY_REPORTS, ACCEPT_WEEKLY_REPORTS, ACCEPT_MONTHLY_REPORTS,\
+    UNSUBSCRIBE_REPORTS
 from hc.api.models import Channel, Check
 from hc.lib.badges import get_badge_url
 
@@ -209,11 +210,18 @@ def profile(request):
 
         badge_urls.append(get_badge_url(username, tag))
 
+    form = ReportSettingsForm()
+
     ctx = {
         "page": "profile",
         "badge_urls": badge_urls,
         "profile": profile,
-        "show_api_key": show_api_key
+        "show_api_key": show_api_key,
+        "ACCEPT_DAILY_REPORTS": ACCEPT_DAILY_REPORTS,
+        "ACCEPT_WEEKLY_REPORTS": ACCEPT_WEEKLY_REPORTS,
+        "ACCEPT_MONTHLY_REPORTS": ACCEPT_MONTHLY_REPORTS,
+        "UNSUBSCRIBE_REPORTS": UNSUBSCRIBE_REPORTS,
+        "form": form
     }
 
     return render(request, "accounts/profile.html", ctx)
@@ -253,7 +261,7 @@ def unsubscribe_reports(request, username):
         return HttpResponseBadRequest()
 
     user = User.objects.get(username=username)
-    user.profile.reports_allowed = False
+    user.profile.reports_allowed = UNSUBSCRIBE_REPORTS
     user.profile.save()
 
     return render(request, "accounts/unsubscribed.html")

@@ -15,8 +15,8 @@ def num_pinged_checks(profile):
 
 
 class Command(BaseCommand):
-    help = 'Send due monthly reports'
-    tmpl = "Sending monthly report to %s"
+    help = 'Send due periodic reports'
+    tmpl = "Sending periodic report to %s"
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -29,14 +29,9 @@ class Command(BaseCommand):
 
     def handle_one_run(self):
         now = timezone.now()
-        month_before = now - timedelta(days=30)
-
         report_due = Q(next_report_date__lt=now)
         report_not_scheduled = Q(next_report_date__isnull=True)
-
         q = Profile.objects.filter(report_due | report_not_scheduled)
-        q = q.filter(reports_allowed=True)
-        q = q.filter(user__date_joined__lt=month_before)
         sent = 0
         for profile in q:
             if num_pinged_checks(profile) > 0:
