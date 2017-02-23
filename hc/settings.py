@@ -98,7 +98,8 @@ else:
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = os.environ.get('TIME_ZONE')
+
 
 USE_I18N = True
 
@@ -122,7 +123,12 @@ STATICFILES_FINDERS = (
 
 COMPRESS_OFFLINE = True
 
-EMAIL_BACKEND = "djmail.backends.default.EmailBackend"
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND')
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_PORT = os.environ.get('EMAIL_PORT')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL')
 
 # Slack integration -- override these in local_settings
 SLACK_CLIENT_ID = None
