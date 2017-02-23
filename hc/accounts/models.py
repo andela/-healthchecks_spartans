@@ -61,6 +61,7 @@ class Profile(models.Model):
     def send_report(self):
         # reset next report date first:
         interval = ""
+        reports = ""
         now = timezone.now()
         if self.reports_allowed == ACCEPT_MONTHLY_REPORTS:
             self.next_report_date = now + timedelta(days=30)
