@@ -229,7 +229,7 @@ def profile(request):
 
 @login_required
 def set_password(request, token):
-    profile = request.user.profilec
+    profile = request.user.profile
     if not check_password(token, profile.token):
         return HttpResponseBadRequest()
 
