@@ -12,6 +12,11 @@ from django.urls import reverse
 from django.utils import timezone
 from hc.lib import emails
 
+ACCEPT_DAILY_REPORTS = 3
+ACCEPT_WEEKLY_REPORTS = 2
+ACCEPT_MONTHLY_REPORTS = 1
+UNSUBSCRIBE_REPORTS = 0
+
 
 class Profile(models.Model):
     # Owner:
@@ -19,7 +24,7 @@ class Profile(models.Model):
     team_name = models.CharField(max_length=200, blank=True)
     team_access_allowed = models.BooleanField(default=False)
     next_report_date = models.DateTimeField(null=True, blank=True)
-    reports_allowed = models.CharField(max_length=1, default='0')
+    reports_allowed = models.IntegerField(max_length=1, default=0)
     ping_log_limit = models.IntegerField(default=100)
     token = models.CharField(max_length=128, blank=True)
     api_key = models.CharField(max_length=128, blank=True)
@@ -57,15 +62,15 @@ class Profile(models.Model):
         # reset next report date first:
         interval = ""
         now = timezone.now()
-        if self.reports_allowed == "1":
+        if self.reports_allowed == ACCEPT_MONTHLY_REPORTS:
             self.next_report_date = now + timedelta(days=30)
             interval = "Monthly"
             reports = "Monthly Reports"
-        elif self.reports_allowed == "2":
+        elif self.reports_allowed == ACCEPT_WEEKLY_REPORTS:
             self.next_report_date = now + timedelta(days=7)
             interval = "Weekly"
             reports = "Weekly Reports"
-        elif self.reports_allowed == "3":
+        elif self.reports_allowed == ACCEPT_MONTHLY_REPORTS:
             self.next_report_date = now + timedelta(days=1)
             interval = "Daily"
             reports = "Daily Reports"
