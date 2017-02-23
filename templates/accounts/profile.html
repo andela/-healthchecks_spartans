@@ -202,13 +202,17 @@
                     <h4 class="remove-check-title">Report Schedule</h4>
                 </div>
                 <div class="modal-body">
-                    <p>You are about to change the current report schedule.</p>
-{#                    {{ form }}#}
+                    <p style="text-align: center;">You are about to change the current report schedule.</p>
                     {% for choice in form.reports_allowed %}
-                        <div class="row" style="display:inline-block;"><div>{{ choice.tag }}</div>
-                            <div>{{ choice.choice_label }}</div></div>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-offset-1 col-md-9">
+                                    <div style="display:inline-block;">{{ choice.tag }}</div>
+                                    <div style="display:inline-block;">{{ choice.choice_label }}</div>
+                                </div>
+                            </div>
+                        </div>
                     {% endfor %}
-                    <p>Are you sure?</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
