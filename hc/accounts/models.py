@@ -70,7 +70,7 @@ class Profile(models.Model):
             self.next_report_date = now + timedelta(days=7)
             interval = "Weekly"
             reports = "Weekly Reports"
-        elif self.reports_allowed == ACCEPT_MONTHLY_REPORTS:
+        elif self.reports_allowed == ACCEPT_DAILY_REPORTS:
             self.next_report_date = now + timedelta(days=1)
             interval = "Daily"
             reports = "Daily Reports"
